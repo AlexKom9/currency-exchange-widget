@@ -7,10 +7,11 @@ import 'swiper/swiper.scss'
 import 'swiper/components/pagination/pagination.min.css'
 import { Slide } from './slide'
 import { IAccountStore } from '../../../types/accounts_store'
+import { useCurrencyExchangeWidgetStore } from '../../../contexts/currency_exchange_widget_store_context'
 
 SwiperCore.use([Keyboard, Pagination])
 
-const Container = styled.div<Pick<ISlider, 'position'>>`
+const Container = styled.div<Pick<ISlider, 'mode'>>`
   height: 200px;
   width: 100%;
   padding-top: 32px;
@@ -24,8 +25,8 @@ const Container = styled.div<Pick<ISlider, 'position'>>`
   .swiper-pagination {
     bottom: 32px;
   }
-  ${({ position }) =>
-    position === 'top'
+  ${({ mode }) =>
+    mode === 'from'
       ? css`
           position: relative;
           background: #3f94e4;
@@ -49,13 +50,15 @@ const Container = styled.div<Pick<ISlider, 'position'>>`
 `
 
 interface ISlider {
-  position: 'top' | 'bottom'
+  mode: 'from' | 'to'
   accounts: IAccountStore[]
 }
 
-export const Slider = ({ position, accounts }: ISlider) => {
+export const Slider = ({ mode, accounts }: ISlider) => {
+  const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
+
   return (
-    <Container position={position}>
+    <Container mode={mode}>
       <div className="container height-full">
         <Swiper
           slidesPerView={1}
@@ -63,21 +66,13 @@ export const Slider = ({ position, accounts }: ISlider) => {
             clickable: true,
           }}
         >
-          {accounts.map(({ currency }) => (
-            <SwiperSlide key={currency}>
-              <Slide />
+          {accounts.map((account) => (
+            <SwiperSlide key={account.currency}>
+              <Slide account={account} mode={mode} />
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
     </Container>
-  )
-}
-
-Slider.Slide = () => {
-  return (
-    <SwiperSlide>
-      <Slide />
-    </SwiperSlide>
   )
 }

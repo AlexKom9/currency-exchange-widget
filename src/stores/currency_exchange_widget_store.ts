@@ -15,7 +15,7 @@ export const CurrencyExchangeWidgetStore = types
     activeAccountTo: types.union(
       ...['GBP', 'EUR', 'USD'].map((item) => types.literal(item))
     ),
-    valueFrom: 0,
+    valueFrom: '',
     ratesData: types.optional(CurrencyExchangeRatesResponseData, {}),
     networkStatus: types.optional(LoadingStatus, {}),
   })
@@ -37,22 +37,22 @@ export const CurrencyExchangeWidgetStore = types
     },
     get formattedValueTo() {
       // TODO: add converting function
-      return String(0.5 * self.valueFrom)
+      return String(0.5 * Number(self.valueFrom))
     },
-    get toAccountCurrentSum() {
-      // TODO: update
+    // get toAccountCurrentSum() {
+    //   // TODO: update
 
-      return this.accountsStore.accounts.find(
-        (item) => item.currency === self.activeAccountTo
-      )
-    },
-    get fromAccountCurrentSum() {
-      // TODO: update
+    //   return this.accountsStore.accounts.find(
+    //     (item) => item.currency === self.activeAccountTo
+    //   )
+    // },
+    // get fromAccountCurrentSum() {
+    //   // TODO: update
 
-      return this.accountsStore.accounts.find(
-        (item) => item.currency === self.activeAccountFrom
-      )
-    },
+    //   return this.accountsStore.accounts.find(
+    //     (item) => item.currency === self.activeAccountFrom
+    //   )
+    // },
   }))
   .actions((self) => ({
     getCurrencyRates: flow(function* () {
@@ -62,12 +62,10 @@ export const CurrencyExchangeWidgetStore = types
 
       applySnapshot(self.ratesData, response)
     }),
-    handleChangeFromValue({
-      target: { value },
-    }: {
-      target: { name: string; value: string }
-    }) {
-      self.valueFrom = Number(value)
+    updateFromValue({ value }: { value: string }) {
+      console.log('value ->', value)
+      self.valueFrom = value
+      console.log('self.valueFrom ->', self.valueFrom)
     },
     init() {
       this.getCurrencyRates()
