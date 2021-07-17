@@ -6,6 +6,7 @@ import SwiperCore, { Keyboard, Pagination } from 'swiper/core'
 import 'swiper/swiper.scss'
 import 'swiper/components/pagination/pagination.min.css'
 import { Slide } from './slide'
+import { IAccountStore } from '../../../types/accounts_store'
 
 SwiperCore.use([Keyboard, Pagination])
 
@@ -49,11 +50,12 @@ const Container = styled.div<Pick<ISlider, 'position'>>`
 
 interface ISlider {
   position: 'top' | 'bottom'
+  accounts: IAccountStore[]
 }
 
-export const Slider = (props: ISlider) => {
+export const Slider = ({ position, accounts }: ISlider) => {
   return (
-    <Container position={props.position}>
+    <Container position={position}>
       <div className="container height-full">
         <Swiper
           slidesPerView={1}
@@ -61,17 +63,21 @@ export const Slider = (props: ISlider) => {
             clickable: true,
           }}
         >
-          <SwiperSlide>
-            <Slide />
-          </SwiperSlide>
-          <SwiperSlide>
-            <Slide />
-          </SwiperSlide>
-          <SwiperSlide>
-            <Slide />
-          </SwiperSlide>
+          {accounts.map(({ currency }) => (
+            <SwiperSlide key={currency}>
+              <Slide />
+            </SwiperSlide>
+          ))}
         </Swiper>
       </div>
     </Container>
+  )
+}
+
+Slider.Slide = () => {
+  return (
+    <SwiperSlide>
+      <Slide />
+    </SwiperSlide>
   )
 }

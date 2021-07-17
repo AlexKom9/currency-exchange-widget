@@ -1,10 +1,10 @@
 import React from 'react'
-import { ExchangeWidgetRoot } from './exchange_widget/exchange_widget_root'
+import { CurrencyExchangeWidgetRoot } from './exchange_widget/currency_exchange_widget_root'
 
 function App() {
     return (
         <div className="App">
-            <ExchangeWidgetRoot />
+            <CurrencyExchangeWidgetRoot />
         </div>
     )
 }
