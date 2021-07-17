@@ -1,9 +1,5 @@
 import { types } from 'mobx-state-tree'
-
-// const CurrencyExchangeRatesResponseData = types.model({
-//   base: 'USD',
-//   rates: types.maybeNull(types.model({ EUR: types.number, GBP: types.number })),
-// })
+import currencyFormatter from 'currency-formatter'
 
 export const AccountStore = types
   .model({
@@ -11,14 +7,27 @@ export const AccountStore = types
     sum: types.number,
   })
   .views((self) => ({
-    formattedSum(){
-      // TODO: update
-      return String(self.sum)
-    }
+    get formattedSum() {
+      return this.formatValueInCurrency({
+        value: self.sum,
+        currency: self.currency,
+      })
+    },
+    formatValueInCurrency({
+      value,
+      currency,
+    }: {
+      value: number
+      currency: string
+    }) {
+      return currencyFormatter.format(value, {
+        code: currency,
+        precision: 0,
+        format: '%s%v'
+      })
+    },
   }))
 
 export const AccountsStore = types.model({
   accounts: types.array(AccountStore),
 })
-// .views((self) => ({}))
-// .actions((self) => ({}))

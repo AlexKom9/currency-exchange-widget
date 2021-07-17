@@ -64,18 +64,26 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
     }
   }, [isActive, mode, account.currency, currencyExchangeWidgetStore])
 
+  let valueFrom = currencyExchangeWidgetStore.valueFrom
+
+  if (valueFrom && valueFrom[0] !== '-') {
+    valueFrom = `-${valueFrom}`
+  }
+
   return (
     <Container>
       <SlideInner>
         <div className="slide-info-container">
           <H2>{account.currency}</H2>
-          <Description className="mts">You have ${account.sum}</Description>
+          <Description className="mts">
+            You have {account.formattedSum}
+          </Description>
         </div>
         {mode === 'from' ? (
           <div className="slide-value-container">
             <InputNumber
               disabled={!isActive}
-              value={currencyExchangeWidgetStore.valueFrom}
+              value={valueFrom}
               onChange={handleChange}
               autofocus
             />
@@ -84,10 +92,10 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
           <SlideAccountTOInfoContainer className="slide-info-container text-right">
             <H2>
               {currencyExchangeWidgetStore.shouldShowFormattedValueTo &&
-                currencyExchangeWidgetStore.formattedValueTo}
+                `+${currencyExchangeWidgetStore.valueTo}`}
             </H2>
             <Description className="mts">
-              You have ${account.sum}
+              You have {account.formattedSum}
             </Description>
           </SlideAccountTOInfoContainer>
         )}

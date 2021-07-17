@@ -1,7 +1,7 @@
 import { applySnapshot, detach, flow, getEnv, types } from 'mobx-state-tree'
 import { nanoid } from 'nanoid'
-import { IAccountsStore } from '../types/accounts_store'
 import { LoadingStatus } from './models/loading_status'
+import { IAccountsStore } from '../types/accounts_store'
 
 const CurrencyExchangeRatesResponseData = types.model({
   base: 'USD',
@@ -33,11 +33,16 @@ export const CurrencyExchangeWidgetStore = types
         (item) => item.currency !== self.activeAccountFrom
       )
     },
+    // get activeAccountTo() {
+    //   return this.accounts.find(
+    //     (item) => item.currency === self.activeAccountTo
+    //   )
+    // },
     get formattedValueFrom() {
       return String(self.valueFrom)
     },
-    get formattedValueTo() {
-      if (!self.ratesData.rates) return null
+    get valueTo() {
+      if (!self.ratesData.rates) return 0
 
       let valueInBase = 0
 
@@ -72,15 +77,15 @@ export const CurrencyExchangeWidgetStore = types
       return Number(result.toFixed(2))
     },
     get shouldShowFormattedValueTo() {
-      return Boolean(this.formattedValueTo)
+      return Boolean(this.valueTo)
     },
   }))
   .actions((self) => ({
     getCurrencyRates: flow(function* () {
-      // const response = yield fetch(
-      //   `https://openexchangerates.org/api/latest.json?app_id=${process.env.REACT_APP_OPENEXCHANGERATES_API_KEY}&symbols=GBP%2CEUR`
-      // ).then((response) => response.json())
-      // applySnapshot(self.ratesData, response)
+      const response = yield fetch(
+        `https://openexchangerates.org/api/latest.json?app_id=${process.env.REACT_APP_OPENEXCHANGERATES_API_KEY}&symbols=GBP%2CEUR`
+      ).then((response) => response.json())
+      applySnapshot(self.ratesData, response)
     }),
     updateActiveFromAccount(currency: string) {
       self.activeAccountFrom = currency
@@ -89,7 +94,7 @@ export const CurrencyExchangeWidgetStore = types
       self.activeAccountTo = currency
     },
     updateFromValue({ value }: { value: string }) {
-      self.valueFrom = value
+      self.valueFrom = value.replace(/-/, '')
     },
     init() {
       this.getCurrencyRates()
