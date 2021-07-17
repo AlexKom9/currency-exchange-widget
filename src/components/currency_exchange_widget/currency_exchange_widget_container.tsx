@@ -1,8 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
+import { observer } from 'mobx-react'
 import { useCurrencyExchangeWidgetStore } from '../../contexts/currency_exchange_widget_store_context'
 import { Button } from '../ui/button'
-import { Slider } from './slider'
+import { Slider } from './slider/slider'
 
 const Container = styled.div`
   background: #3f94e4;
@@ -37,7 +38,7 @@ const Header = styled.header`
   justify-content: space-between;
 `
 
-export const CurrencyExchangeWidgetContainer = () => {
+export const CurrencyExchangeWidgetContainer = observer(() => {
   const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
 
   return (
@@ -49,12 +50,9 @@ export const CurrencyExchangeWidgetContainer = () => {
         </Header>
       </div>
       <div>
-        <Slider
-          mode="from"
-          accounts={currencyExchangeWidgetStore.accountsFrom}
-        />
+        <Slider mode="from" accounts={currencyExchangeWidgetStore.accounts} />
         <Slider mode="to" accounts={currencyExchangeWidgetStore.accountsTo} />
       </div>
     </Container>
   )
-}
+})

@@ -8,6 +8,7 @@ import 'swiper/components/pagination/pagination.min.css'
 import { Slide } from './slide'
 import { IAccountStore } from '../../../types/accounts_store'
 import { useCurrencyExchangeWidgetStore } from '../../../contexts/currency_exchange_widget_store_context'
+import { observer } from 'mobx-react'
 
 SwiperCore.use([Keyboard, Pagination])
 
@@ -25,6 +26,7 @@ const Container = styled.div<Pick<ISlider, 'mode'>>`
   .swiper-pagination {
     bottom: 32px;
   }
+
   ${({ mode }) =>
     mode === 'from'
       ? css`
@@ -54,25 +56,31 @@ interface ISlider {
   accounts: IAccountStore[]
 }
 
-export const Slider = ({ mode, accounts }: ISlider) => {
+export const Slider = observer(({ mode, accounts }: ISlider) => {
   const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
 
   return (
     <Container mode={mode}>
       <div className="container height-full">
         <Swiper
+          key={currencyExchangeWidgetStore.key}
           slidesPerView={1}
           pagination={{
             clickable: true,
           }}
+          observer={true}
         >
           {accounts.map((account) => (
             <SwiperSlide key={account.currency}>
-              <Slide account={account} mode={mode} />
+              {({ isActive }) => {
+                return (
+                  <Slide account={account} mode={mode} isActive={isActive} />
+                )
+              }}
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
     </Container>
   )
-}
+})
