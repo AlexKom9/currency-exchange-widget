@@ -57,7 +57,10 @@ interface ISlider {
 
 export const Slider = observer(({ mode, accounts }: ISlider) => {
   return (
-    <Container mode={mode}>
+    <Container
+      data-testid={`ac-currency-exchange-widget-slider-${mode}`}
+      mode={mode}
+    >
       <div className="container height-full">
         <Swiper
           slidesPerView={1}
@@ -67,7 +70,7 @@ export const Slider = observer(({ mode, accounts }: ISlider) => {
           observer={true}
         >
           {accounts.map((account) => (
-            <SwiperSlide key={account.currency}>
+            <SwiperSlide data-testid="ac-currency-exchange-widget-slider-slide" key={account.currency}>
               {({ isActive }) => {
                 return (
                   <Slide account={account} mode={mode} isActive={isActive} />

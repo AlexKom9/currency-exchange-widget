@@ -4,27 +4,26 @@ import { CurrencyExchangeWidgetContainer } from './currency_exchange_widget_cont
 import { CurrencyExchangeWidgetStoreContext } from '../../contexts/currency_exchange_widget_store_context'
 import { CurrencyExchangeWidgetStore } from '../../stores/currency_exchange_widget_store'
 import { ICurrencyExchangeWidgetStore } from '../../types/currency_exchange_widget_store'
-import { AccountsStore } from '../../stores/accounts_store'
 import { useInitStore } from '../../hooks/use_init_store'
-import { FakeFetcher } from '../../stores/helpers/fake_fetcher'
+import { IAccountsStore } from '../../types/accounts_store'
+import { Fetcher } from '../../types/fetcher'
 
-export const CurrencyExchangeWidgetRoot = () => {
+interface ICurrencyExchangeWidgetRoot {
+  accountsStore: IAccountsStore
+  fetcher: Fetcher
+}
+
+export const CurrencyExchangeWidgetRoot = ({
+  accountsStore,
+  fetcher,
+}: ICurrencyExchangeWidgetRoot) => {
   const initStore = (): ICurrencyExchangeWidgetStore => {
-    const accountsStore = AccountsStore.create({
-      accounts: [
-        { currency: 'USD', sum: 100 },
-        { currency: 'EUR', sum: 0 },
-        { currency: 'GBP', sum: 0 },
-        { currency: 'UAH', sum: 0 },
-      ],
-    })
-
     const store = CurrencyExchangeWidgetStore.create(
       {
         activeAccountFrom: 'USD',
         activeAccountTo: 'EUR',
       },
-      { accountsStore, fetcher: new FakeFetcher({ randomizeRates: true }) }
+      { accountsStore, fetcher }
     )
 
     store.init()

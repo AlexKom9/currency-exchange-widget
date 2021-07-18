@@ -46,7 +46,7 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
   }
 
   return (
-    <Container>
+    <Container data-testid="ac-currency-exchange-widget-container">
       <div className="container">
         <Header>
           <Button>Cancel</Button>

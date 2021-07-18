@@ -1,6 +1,7 @@
 // export const getMock = (path) => {
 //   const fileValue = String(fs.readFileSync(path))
 import { RatesResponse } from '../../fixtures/rates_response'
+import { Fetcher } from '../../types/fetcher'
 
 //   try {
 //     return JSON.parse(fileValue)
@@ -21,7 +22,7 @@ function getRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export class FakeFetcher {
+export class FakeFetcher implements Fetcher {
   randomizeRates: boolean
   responsesToMock: Array<typeof RatesResponse>
 

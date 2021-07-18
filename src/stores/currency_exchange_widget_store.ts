@@ -140,7 +140,6 @@ export const CurrencyExchangeWidgetStore = types
         this.monitorCurrencyRates()
       },
       reset() {
-        applySnapshot(self, {})
         detach(self)
         clearTimeout(fetchTimer)
       },
