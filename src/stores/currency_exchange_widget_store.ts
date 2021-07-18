@@ -1,8 +1,9 @@
 import { applySnapshot, detach, flow, getEnv, types } from 'mobx-state-tree'
 import { LoadingStatus } from './models/loading_status'
 import { IAccountsStore } from '../types/accounts_store'
-import { formatValueInCurrency } from './helpers'
+import { formatValueInCurrency } from './helpers/format_value_in_currency'
 import { CURRENCIES } from '../constants'
+import { FakeFetcher } from './helpers/fake_fetcher'
 
 const CurrencyExchangeRatesResponseData = types.model({
   base: 'USD',
@@ -34,12 +35,17 @@ export const CurrencyExchangeWidgetStore = types
       )
     },
     get accountToRate() {
-      return (
-        (self.ratesData.rates.get(self.activeAccountTo) || 1) /
-        (self.ratesData.rates.get(self.activeAccountFrom) || 1)
-      )
+      const accountToRate =
+        (self.ratesData.rates.get(self.activeAccountFrom) || 1) /
+        (self.ratesData.rates.get(self.activeAccountTo) || 1)
+
+      return accountToRate
     },
     get accountFromRate() {
+      if (self.activeAccountFrom === 'USD') {
+        return self.ratesData.rates.get(self.activeAccountTo) || 0
+      }
+
       return 1 / this.accountToRate
     },
     get formattedAccountFromRate() {
@@ -86,38 +92,57 @@ export const CurrencyExchangeWidgetStore = types
     get shouldShowFormattedValueTo() {
       return Boolean(this.valueTo)
     },
-  }))
-  .actions((self) => ({
-    getCurrencyRates: flow(function* () {
-      try {
-        self.networkStatus.update('in_progress')
-
-        const response = yield fetch(
-          `https://openexchangerates.org/api/latest.json?app_id=${process.env.REACT_APP_OPENEXCHANGERATES_API_KEY}&symbols=GBP%2CEUR`
-        ).then((response) => response.json())
-
-        self.networkStatus.update('success')
-
-        applySnapshot(self.ratesData, response)
-      } catch (e) {
-        self.networkStatus.update('error')
-        console.error(e)
-      }
-    }),
-    updateActiveFromAccount(currency: string) {
-      self.activeAccountFrom = currency
-    },
-    updateActiveToAccount(currency: string) {
-      self.activeAccountTo = currency
-    },
-    updateFromValue({ value }: { value: string }) {
-      self.valueFrom = value.replace(/-/, '')
-    },
-    init() {
-      this.getCurrencyRates()
-    },
-    reset() {
-      applySnapshot(self, {})
-      detach(self)
+    get fetcher(): FakeFetcher {
+      return getEnv(self).fetcher
     },
   }))
+  .actions((self) => {
+    let fetchTimer: ReturnType<typeof setTimeout>
+
+    return {
+      fetchCurrencyRates: flow(function* () {
+        try {
+          self.networkStatus.update('in_progress')
+
+          const response = yield self.fetcher.apiGet(
+            `https://openexchangerates.org/api/latest.json?app_id=${process.env.REACT_APP_OPENEXCHANGERATES_API_KEY}`
+          )
+
+          self.networkStatus.update('success')
+
+          applySnapshot(self.ratesData, response)
+        } catch (e) {
+          self.networkStatus.update('error')
+          console.error(e)
+        }
+      }),
+      monitorCurrencyRates() {
+        this.fetchCurrencyRates().then(() => {
+          if (fetchTimer) {
+            clearTimeout(fetchTimer)
+          }
+
+          fetchTimer = setTimeout(() => {
+            this.monitorCurrencyRates()
+          }, 1000)
+        })
+      },
+      updateActiveFromAccount(currency: string) {
+        self.activeAccountFrom = currency
+      },
+      updateActiveToAccount(currency: string) {
+        self.activeAccountTo = currency
+      },
+      updateFromValue({ value }: { value: string }) {
+        self.valueFrom = value.replace(/-/, '')
+      },
+      init() {
+        this.monitorCurrencyRates()
+      },
+      reset() {
+        applySnapshot(self, {})
+        detach(self)
+        clearTimeout(fetchTimer)
+      },
+    }
+  })

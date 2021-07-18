@@ -6,6 +6,7 @@ import { CurrencyExchangeWidgetStore } from '../../stores/currency_exchange_widg
 import { ICurrencyExchangeWidgetStore } from '../../types/currency_exchange_widget_store'
 import { AccountsStore } from '../../stores/accounts_store'
 import { useInitStore } from '../../hooks/use_init_store'
+import { FakeFetcher } from '../../stores/helpers/fake_fetcher'
 
 export const CurrencyExchangeWidgetRoot = () => {
   const initStore = (): ICurrencyExchangeWidgetStore => {
@@ -14,14 +15,16 @@ export const CurrencyExchangeWidgetRoot = () => {
         { currency: 'USD', sum: 100 },
         { currency: 'EUR', sum: 0 },
         { currency: 'GBP', sum: 0 },
+        { currency: 'UAH', sum: 0 },
       ],
     })
+
     const store = CurrencyExchangeWidgetStore.create(
       {
         activeAccountFrom: 'USD',
         activeAccountTo: 'EUR',
       },
-      { accountsStore }
+      { accountsStore, fetcher: new FakeFetcher({ randomizeRates: true }) }
     )
 
     store.init()

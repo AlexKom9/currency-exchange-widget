@@ -1,5 +1,5 @@
 import { types } from 'mobx-state-tree'
-import { formatValueInCurrency } from './helpers'
+import { formatValueInCurrency } from './helpers/format_value_in_currency'
 
 export const AccountStore = types
   .model({

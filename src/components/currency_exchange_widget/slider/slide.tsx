@@ -47,8 +47,6 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
   const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
-
     currencyExchangeWidgetStore.updateFromValue({
       value: e.target.value,
     })
