@@ -2,20 +2,21 @@ import { applySnapshot, detach, flow, getEnv, types } from 'mobx-state-tree'
 import { LoadingStatus } from './models/loading_status'
 import { IAccountsStore } from '../types/accounts_store'
 import { formatValueInCurrency } from './helpers'
+import { CURRENCIES } from '../constants'
 
 const CurrencyExchangeRatesResponseData = types.model({
   base: 'USD',
   rates: types.map(types.number),
 })
 
+const CurrencyUnionType = types.union(
+  ...CURRENCIES.map((item) => types.literal(item))
+)
+
 export const CurrencyExchangeWidgetStore = types
   .model({
-    activeAccountFrom: types.union(
-      ...['GBP', 'EUR', 'USD'].map((item) => types.literal(item))
-    ),
-    activeAccountTo: types.union(
-      ...['GBP', 'EUR', 'USD'].map((item) => types.literal(item))
-    ),
+    activeAccountFrom: CurrencyUnionType,
+    activeAccountTo: CurrencyUnionType,
     valueFrom: '',
     ratesData: types.optional(CurrencyExchangeRatesResponseData, {}),
     networkStatus: types.optional(LoadingStatus, {}),

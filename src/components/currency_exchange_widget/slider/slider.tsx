@@ -1,5 +1,6 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
+import { observer } from 'mobx-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Keyboard, Pagination } from 'swiper/core'
 
@@ -7,8 +8,6 @@ import 'swiper/swiper.scss'
 import 'swiper/components/pagination/pagination.min.css'
 import { Slide } from './slide'
 import { IAccountStore } from '../../../types/accounts_store'
-import { useCurrencyExchangeWidgetStore } from '../../../contexts/currency_exchange_widget_store_context'
-import { observer } from 'mobx-react'
 
 SwiperCore.use([Keyboard, Pagination])
 

@@ -20,6 +20,18 @@ interface IInputNumber {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
+function format(str: string | number = ''): string {
+  if (Number(str) === Infinity) {
+    return String(Infinity)
+  }
+
+  return String(str)
+    .replace(/[^0-9.]/g, '')
+    .replace(/^([^.]*\.)(.*)$/, function (_, pattern1, pattern2) {
+      return pattern1 + pattern2.replaceAll('.', '')
+    })
+}
+
 export const InputNumber = observer(
   ({ value, onChange, disabled = false, autofocus }: IInputNumber) => {
     const [ref, focus] = useAutoFocus()
@@ -34,11 +46,17 @@ export const InputNumber = observer(
       }
     }, [autofocus, disabled, focus])
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.target.value = format(e.target.value)
+
+      onChange(e)
+    }
+
     return (
       <InputNumberStyled
         ref={autofocus && !disabled ? ref : undefined}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         disabled={disabled}
         type="text"
       />
