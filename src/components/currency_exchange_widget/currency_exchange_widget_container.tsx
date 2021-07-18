@@ -4,12 +4,12 @@ import { observer } from 'mobx-react'
 import { useCurrencyExchangeWidgetStore } from '../../contexts/currency_exchange_widget_store_context'
 import { Button } from '../ui/button'
 import { Slider } from './slider/slider'
+import { Description } from '../ui/typography'
 
 const Container = styled.div`
   background: #3f94e4;
-  max-width: 414px;
-  min-height: 716px;
-  height: 100vh;
+  width: 414px;
+  height: 482px;
   padding-top: 24px;
 
   .container {
@@ -41,11 +41,18 @@ const Header = styled.header`
 export const CurrencyExchangeWidgetContainer = observer(() => {
   const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
 
+  if (!currencyExchangeWidgetStore.networkStatus.isLoaded) {
+    return null
+  }
+
   return (
     <Container>
       <div className="container">
         <Header>
           <Button>Cancel</Button>
+          <Description>
+            {currencyExchangeWidgetStore.formattedAccountFromRate}
+          </Description>
           <Button>Exchange</Button>
         </Header>
       </div>

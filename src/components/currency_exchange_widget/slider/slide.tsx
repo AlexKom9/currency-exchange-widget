@@ -95,7 +95,7 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
                 `+${currencyExchangeWidgetStore.valueTo}`}
             </H2>
             <Description className="mts">
-              You have {account.formattedSum}
+              {currencyExchangeWidgetStore.formattedAccountToRate}
             </Description>
           </SlideAccountTOInfoContainer>
         )}

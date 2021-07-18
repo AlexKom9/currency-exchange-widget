@@ -2,10 +2,11 @@ import { applySnapshot, detach, flow, getEnv, types } from 'mobx-state-tree'
 import { nanoid } from 'nanoid'
 import { LoadingStatus } from './models/loading_status'
 import { IAccountsStore } from '../types/accounts_store'
+import { formatValueInCurrency } from './helpers'
 
 const CurrencyExchangeRatesResponseData = types.model({
   base: 'USD',
-  rates: types.maybeNull(types.model({ EUR: types.number, GBP: types.number })),
+  rates: types.map(types.number),
 })
 
 export const CurrencyExchangeWidgetStore = types
@@ -33,42 +34,80 @@ export const CurrencyExchangeWidgetStore = types
         (item) => item.currency !== self.activeAccountFrom
       )
     },
-    // get activeAccountTo() {
-    //   return this.accounts.find(
-    //     (item) => item.currency === self.activeAccountTo
-    //   )
-    // },
+    get accountToRate() {
+      return (
+        (self.ratesData.rates.get(self.activeAccountTo) || 1) /
+        (self.ratesData.rates.get(self.activeAccountFrom) || 1)
+      )
+    },
+    get accountFromRate() {
+      return 1 / this.accountToRate
+    },
+    get formattedAccountFromRate() {
+      const first = formatValueInCurrency({
+        value: 1,
+        currency: self.activeAccountFrom,
+      })
+
+      const second = formatValueInCurrency({
+        value: this.accountFromRate,
+        currency: self.activeAccountTo,
+        precision: 4,
+      })
+
+      return `${first}= ${second}`
+    },
+    get formattedAccountToRate() {
+      const first = formatValueInCurrency({
+        value: 1,
+        currency: self.activeAccountTo,
+      })
+
+      const second = formatValueInCurrency({
+        value: this.accountToRate,
+        currency: self.activeAccountFrom,
+        precision: 2,
+      })
+
+      return `${first}= ${second}`
+    },
+    get _valueFromInBase() {
+      if (!self.ratesData.rates) {
+        throw new Error('No rates data')
+      }
+
+      switch (self.activeAccountFrom) {
+        case 'USD':
+          return Number(self.valueFrom)
+        case 'EUR':
+          return Number(self.valueFrom) / (self.ratesData.rates.get('EUR') || 1)
+        case 'GBP':
+          return Number(self.valueFrom) / (self.ratesData.rates.get('GBP') || 1)
+        default:
+          return 0
+      }
+    },
     get formattedValueFrom() {
       return String(self.valueFrom)
     },
     get valueTo() {
-      if (!self.ratesData.rates) return 0
-
-      let valueInBase = 0
-
-      switch (self.activeAccountFrom) {
-        case 'USD':
-          valueInBase = Number(self.valueFrom)
-          break
-        case 'EUR':
-          valueInBase = Number(self.valueFrom) / self.ratesData.rates?.EUR
-          break
-        case 'GBP':
-          valueInBase = Number(self.valueFrom) / self.ratesData.rates?.GBP
-          break
+      if (!self.ratesData.rates) {
+        return 0
       }
 
       let result = 0
 
       switch (self.activeAccountTo) {
         case 'USD':
-          result = valueInBase
+          result = this._valueFromInBase
           break
         case 'EUR':
-          result = valueInBase * self.ratesData.rates?.EUR
+          result =
+            this._valueFromInBase * (self.ratesData.rates.get('EUR') || 1)
           break
         case 'GBP':
-          result = valueInBase * self.ratesData.rates?.GBP
+          result =
+            this._valueFromInBase * (self.ratesData.rates.get('GBP') || 1)
           break
         default:
           return 0
@@ -82,10 +121,20 @@ export const CurrencyExchangeWidgetStore = types
   }))
   .actions((self) => ({
     getCurrencyRates: flow(function* () {
-      const response = yield fetch(
-        `https://openexchangerates.org/api/latest.json?app_id=${process.env.REACT_APP_OPENEXCHANGERATES_API_KEY}&symbols=GBP%2CEUR`
-      ).then((response) => response.json())
-      applySnapshot(self.ratesData, response)
+      try {
+        self.networkStatus.update('in_progress')
+
+        const response = yield fetch(
+          `https://openexchangerates.org/api/latest.json?app_id=${process.env.REACT_APP_OPENEXCHANGERATES_API_KEY}&symbols=GBP%2CEUR`
+        ).then((response) => response.json())
+
+        self.networkStatus.update('success')
+
+        applySnapshot(self.ratesData, response)
+      } catch (e) {
+        self.networkStatus.update('error')
+        console.error(e)
+      }
     }),
     updateActiveFromAccount(currency: string) {
       self.activeAccountFrom = currency

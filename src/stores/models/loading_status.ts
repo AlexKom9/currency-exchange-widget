@@ -25,7 +25,7 @@ export const LoadingStatus = types
     updateLoading: (state: boolean) => {
       self.isLoading = state
     },
-    update(status: Status) {
+    update(status: keyof typeof Status) {
       self.status = status
       if (status === 'in_progress') {
         this.updateLoading(true)

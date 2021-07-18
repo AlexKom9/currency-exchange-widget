@@ -1,5 +1,5 @@
 import { types } from 'mobx-state-tree'
-import currencyFormatter from 'currency-formatter'
+import { formatValueInCurrency } from './helpers'
 
 export const AccountStore = types
   .model({
@@ -8,22 +8,9 @@ export const AccountStore = types
   })
   .views((self) => ({
     get formattedSum() {
-      return this.formatValueInCurrency({
+      return formatValueInCurrency({
         value: self.sum,
         currency: self.currency,
-      })
-    },
-    formatValueInCurrency({
-      value,
-      currency,
-    }: {
-      value: number
-      currency: string
-    }) {
-      return currencyFormatter.format(value, {
-        code: currency,
-        precision: 0,
-        format: '%s%v'
       })
     },
   }))
