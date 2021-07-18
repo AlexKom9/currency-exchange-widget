@@ -1,5 +1,4 @@
 import { applySnapshot, detach, flow, getEnv, types } from 'mobx-state-tree'
-import { nanoid } from 'nanoid'
 import { LoadingStatus } from './models/loading_status'
 import { IAccountsStore } from '../types/accounts_store'
 import { formatValueInCurrency } from './helpers'
@@ -20,7 +19,6 @@ export const CurrencyExchangeWidgetStore = types
     valueFrom: '',
     ratesData: types.optional(CurrencyExchangeRatesResponseData, {}),
     networkStatus: types.optional(LoadingStatus, {}),
-    key: nanoid(),
   })
   .views((self) => ({
     get accountsStore(): IAccountsStore {
@@ -71,22 +69,6 @@ export const CurrencyExchangeWidgetStore = types
 
       return `${first}= ${second}`
     },
-    get _valueFromInBase() {
-      if (!self.ratesData.rates) {
-        throw new Error('No rates data')
-      }
-
-      switch (self.activeAccountFrom) {
-        case 'USD':
-          return Number(self.valueFrom)
-        case 'EUR':
-          return Number(self.valueFrom) / (self.ratesData.rates.get('EUR') || 1)
-        case 'GBP':
-          return Number(self.valueFrom) / (self.ratesData.rates.get('GBP') || 1)
-        default:
-          return 0
-      }
-    },
     get formattedValueFrom() {
       return String(self.valueFrom)
     },
@@ -95,25 +77,10 @@ export const CurrencyExchangeWidgetStore = types
         return 0
       }
 
-      let result = 0
-
-      switch (self.activeAccountTo) {
-        case 'USD':
-          result = this._valueFromInBase
-          break
-        case 'EUR':
-          result =
-            this._valueFromInBase * (self.ratesData.rates.get('EUR') || 1)
-          break
-        case 'GBP':
-          result =
-            this._valueFromInBase * (self.ratesData.rates.get('GBP') || 1)
-          break
-        default:
-          return 0
-      }
-
-      return Number(result.toFixed(2))
+      return this.accountFromRate * Number(self.valueFrom)
+    },
+    get formattedValueTo() {
+      return this.valueTo.toFixed(2)
     },
     get shouldShowFormattedValueTo() {
       return Boolean(this.valueTo)

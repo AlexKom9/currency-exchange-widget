@@ -57,13 +57,10 @@ interface ISlider {
 }
 
 export const Slider = observer(({ mode, accounts }: ISlider) => {
-  const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
-
   return (
     <Container mode={mode}>
       <div className="container height-full">
         <Swiper
-          key={currencyExchangeWidgetStore.key}
           slidesPerView={1}
           pagination={{
             clickable: true,

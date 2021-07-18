@@ -92,7 +92,7 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
           <SlideAccountTOInfoContainer className="slide-info-container text-right">
             <H2>
               {currencyExchangeWidgetStore.shouldShowFormattedValueTo &&
-                `+${currencyExchangeWidgetStore.valueTo}`}
+                `+${currencyExchangeWidgetStore.formattedValueTo}`}
             </H2>
             <Description className="mts">
               {currencyExchangeWidgetStore.formattedAccountToRate}
