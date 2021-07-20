@@ -69,7 +69,9 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
   }
 
   return (
-    <Container>
+    <Container
+      data-testid={`ac-currency-exchange-widget-slide-${mode}-account-${account.currency}`}
+    >
       <SlideInner>
         <div className="slide-info-container">
           <H2>{account.currency}</H2>
@@ -80,6 +82,7 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
         {mode === 'from' ? (
           <div className="slide-value-container">
             <InputNumber
+              data-testid="ac-currency-exchange-widget-input"
               disabled={!isActive}
               value={valueFrom}
               onChange={handleChange}

@@ -53,7 +53,9 @@ export class FakeFetcher implements Fetcher {
           {}
         )
 
-        resolve({ ...RatesResponse, rates: processedRates })
+        setTimeout(() => {
+          resolve({ ...RatesResponse, rates: processedRates })
+        }, 500)
       })
     }
 

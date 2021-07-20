@@ -19,10 +19,7 @@ export const CurrencyExchangeWidgetRoot = ({
 }: ICurrencyExchangeWidgetRoot) => {
   const initStore = (): ICurrencyExchangeWidgetStore => {
     const store = CurrencyExchangeWidgetStore.create(
-      {
-        activeAccountFrom: 'USD',
-        activeAccountTo: 'EUR',
-      },
+      {},
       { accountsStore, fetcher }
     )
 

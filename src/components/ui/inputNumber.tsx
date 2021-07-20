@@ -33,7 +33,7 @@ function format(str: string | number = ''): string {
 }
 
 export const InputNumber = observer(
-  ({ value, onChange, disabled = false, autofocus }: IInputNumber) => {
+  ({ value, onChange, disabled = false, autofocus, ...rest }: IInputNumber) => {
     const [ref, focus] = useAutoFocus()
 
     useEffect(() => {
@@ -54,6 +54,7 @@ export const InputNumber = observer(
 
     return (
       <InputNumberStyled
+        {...rest}
         ref={autofocus && !disabled ? ref : undefined}
         value={value}
         onChange={handleChange}

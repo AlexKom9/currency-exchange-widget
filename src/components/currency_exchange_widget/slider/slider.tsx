@@ -2,14 +2,14 @@ import React from 'react'
 import styled, { css } from 'styled-components'
 import { observer } from 'mobx-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Keyboard, Pagination } from 'swiper/core'
+import SwiperCore, { Pagination } from 'swiper/core'
 
 import 'swiper/swiper.scss'
 import 'swiper/components/pagination/pagination.min.css'
 import { Slide } from './slide'
 import { IAccountStore } from '../../../types/accounts_store'
 
-SwiperCore.use([Keyboard, Pagination])
+SwiperCore.use([Pagination])
 
 const Container = styled.div<Pick<ISlider, 'mode'>>`
   height: 200px;
@@ -63,6 +63,7 @@ export const Slider = observer(({ mode, accounts }: ISlider) => {
     >
       <div className="container height-full">
         <Swiper
+          data-testid={`ac-currency-exchange-widget-swiper-${mode}`}
           slidesPerView={1}
           pagination={{
             clickable: true,
@@ -70,7 +71,10 @@ export const Slider = observer(({ mode, accounts }: ISlider) => {
           observer={true}
         >
           {accounts.map((account) => (
-            <SwiperSlide data-testid="ac-currency-exchange-widget-slider-slide" key={account.currency}>
+            <SwiperSlide
+              data-testid="ac-currency-exchange-widget-slider-slide"
+              key={account.currency}
+            >
               {({ isActive }) => {
                 return (
                   <Slide account={account} mode={mode} isActive={isActive} />

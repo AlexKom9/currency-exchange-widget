@@ -16,8 +16,8 @@ const CurrencyUnionType = types.union(
 
 export const CurrencyExchangeWidgetStore = types
   .model({
-    activeAccountFrom: CurrencyUnionType,
-    activeAccountTo: CurrencyUnionType,
+    activeAccountFrom: types.maybeNull(CurrencyUnionType),
+    activeAccountTo: types.maybeNull(CurrencyUnionType),
     valueFrom: '',
     ratesData: types.optional(CurrencyExchangeRatesResponseData, {}),
     networkStatus: types.optional(LoadingStatus, {}),
@@ -110,6 +110,7 @@ export const CurrencyExchangeWidgetStore = types
 
           self.networkStatus.update('success')
 
+          // console.log('-->', response)
           applySnapshot(self.ratesData, response)
         } catch (e) {
           self.networkStatus.update('error')
@@ -118,6 +119,14 @@ export const CurrencyExchangeWidgetStore = types
       }),
       monitorCurrencyRates() {
         this.fetchCurrencyRates().then(() => {
+          if (!self.activeAccountFrom) {
+            this.updateActiveFromAccount(self.accounts[0].currency)
+          }
+
+          if (!self.activeAccountTo) {
+            this.updateActiveToAccount(self.accountsTo[0].currency)
+          }
+
           if (fetchTimer) {
             clearTimeout(fetchTimer)
           }
