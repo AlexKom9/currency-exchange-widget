@@ -1,15 +1,13 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled, { css } from 'styled-components'
 import { observer } from 'mobx-react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Pagination } from 'swiper/core'
 
-import 'swiper/swiper.scss'
-import 'swiper/components/pagination/pagination.min.css'
+import SlickSlider from 'react-slick'
+import 'slick-carousel/slick/slick.css'
+import 'slick-carousel/slick/slick-theme.css'
+
 import { Slide } from './slide'
 import { IAccountStore } from '../../../types/accounts_store'
-
-SwiperCore.use([Pagination])
 
 const Container = styled.div<Pick<ISlider, 'mode'>>`
   height: 200px;
@@ -53,37 +51,65 @@ const Container = styled.div<Pick<ISlider, 'mode'>>`
 interface ISlider {
   mode: 'from' | 'to'
   accounts: IAccountStore[]
+  onChangeSlide: (currentIndex: number) => void
+  activeAccountCurrency: string
 }
 
-export const Slider = observer(({ mode, accounts }: ISlider) => {
-  return (
-    <Container
-      data-testid={`ac-currency-exchange-widget-slider-${mode}`}
-      mode={mode}
-    >
-      <div className="container height-full">
-        <Swiper
-          data-testid={`ac-currency-exchange-widget-swiper-${mode}`}
-          slidesPerView={1}
-          pagination={{
-            clickable: true,
-          }}
-          observer={true}
-        >
-          {accounts.map((account) => (
-            <SwiperSlide
-              data-testid="ac-currency-exchange-widget-slider-slide"
-              key={account.currency}
-            >
-              {({ isActive }) => {
-                return (
-                  <Slide account={account} mode={mode} isActive={isActive} />
-                )
-              }}
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </Container>
-  )
-})
+class SliderContainer extends React.PureComponent<ISlider> {
+  private slider: SlickSlider | null
+
+  constructor(props: ISlider) {
+    super(props)
+    this.slider = null
+  }
+
+  componentDidMount() {
+    this.slider?.slickGoTo(0)
+  }
+
+  render() {
+    const { mode, onChangeSlide, accounts, activeAccountCurrency } = this.props
+    const slickSliderSettings = {
+      dots: true,
+      infinite: false,
+      speed: 300,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: false,
+      beforeChange: (_prevIndex: number, nextIndex: number) => {
+        onChangeSlide(nextIndex)
+      },
+    }
+
+    return (
+      <Container
+        data-testid={`ac-currency-exchange-widget-slider-${mode}`}
+        mode={mode}
+      >
+        <div className="container height-full">
+          <SlickSlider
+            {...slickSliderSettings}
+            ref={(elem) => {
+              this.slider = elem
+            }}
+          >
+            {accounts.map((account) => (
+              <div
+                key={account.currency}
+                data-testid="ac-currency-exchange-widget-slider-slide"
+              >
+                <Slide
+                  account={account}
+                  mode={mode}
+                  isActive={account.currency === activeAccountCurrency}
+                />
+              </div>
+            ))}
+          </SlickSlider>
+        </div>
+      </Container>
+    )
+  }
+}
+
+export const Slider = observer(SliderContainer)

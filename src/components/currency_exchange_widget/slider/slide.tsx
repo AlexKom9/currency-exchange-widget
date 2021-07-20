@@ -8,9 +8,10 @@ import { Description, H2 } from '../../ui/typography'
 
 const Container = styled.div`
   box-sizing: border-box;
-  width: 100%;
+  width: 398px;
   max-width: 100%;
   padding: 8px 32px;
+  height: 160px;
 `
 
 const SlideInner = styled.div`
@@ -52,21 +53,12 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
     })
   }
 
-  useEffect(() => {
-    if (isActive && mode === 'from') {
-      currencyExchangeWidgetStore.updateActiveFromAccount(account.currency)
-    }
-
-    if (isActive && mode === 'to') {
-      currencyExchangeWidgetStore.updateActiveToAccount(account.currency)
-    }
-  }, [isActive, mode, account.currency, currencyExchangeWidgetStore])
-
   let valueFrom = currencyExchangeWidgetStore.valueFrom
 
   if (valueFrom && valueFrom[0] !== '-') {
     valueFrom = `-${valueFrom}`
   }
+
 
   return (
     <Container
@@ -86,7 +78,7 @@ export const Slide = observer(({ account, mode, isActive }: ISlide) => {
               disabled={!isActive}
               value={valueFrom}
               onChange={handleChange}
-              autofocus
+              autofocus={isActive}
             />
           </div>
         ) : (

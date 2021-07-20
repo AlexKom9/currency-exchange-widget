@@ -4,6 +4,7 @@ import { IAccountsStore } from '../types/accounts_store'
 import { formatValueInCurrency } from './helpers/format_value_in_currency'
 import { CURRENCIES } from '../constants'
 import { FakeFetcher } from './helpers/fake_fetcher'
+import { nanoid } from 'nanoid'
 
 const CurrencyExchangeRatesResponseData = types.model({
   base: 'USD',
@@ -21,6 +22,7 @@ export const CurrencyExchangeWidgetStore = types
     valueFrom: '',
     ratesData: types.optional(CurrencyExchangeRatesResponseData, {}),
     networkStatus: types.optional(LoadingStatus, {}),
+    key: nanoid(),
   })
   .views((self) => ({
     get accountsStore(): IAccountsStore {
@@ -119,14 +121,6 @@ export const CurrencyExchangeWidgetStore = types
       }),
       monitorCurrencyRates() {
         this.fetchCurrencyRates().then(() => {
-          if (!self.activeAccountFrom) {
-            this.updateActiveFromAccount(self.accounts[0].currency)
-          }
-
-          if (!self.activeAccountTo) {
-            this.updateActiveToAccount(self.accountsTo[0].currency)
-          }
-
           if (fetchTimer) {
             clearTimeout(fetchTimer)
           }
@@ -136,11 +130,14 @@ export const CurrencyExchangeWidgetStore = types
           }, 1000)
         })
       },
-      updateActiveFromAccount(currency: string) {
-        self.activeAccountFrom = currency
+      updateActiveFromAccount(index: number) {
+        self.activeAccountFrom = self.accounts[index].currency
+        self.key = nanoid()
       },
-      updateActiveToAccount(currency: string) {
-        self.activeAccountTo = currency
+      updateActiveToAccount(index: number) {
+        const newActiveCurrency = self.accountsTo[index].currency
+
+        self.activeAccountTo = newActiveCurrency
       },
       updateFromValue({ value }: { value: string }) {
         self.valueFrom = value.replace(/-/, '')

@@ -57,8 +57,19 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
         </Header>
       </div>
       <div>
-        <Slider mode="from" accounts={currencyExchangeWidgetStore.accounts} />
-        <Slider mode="to" accounts={currencyExchangeWidgetStore.accountsTo} />
+        <Slider
+          mode="from"
+          accounts={currencyExchangeWidgetStore.accounts}
+          onChangeSlide={currencyExchangeWidgetStore.updateActiveFromAccount}
+          activeAccountCurrency={currencyExchangeWidgetStore.activeAccountFrom}
+        />
+        <Slider
+          key={currencyExchangeWidgetStore.key}
+          mode="to"
+          accounts={currencyExchangeWidgetStore.accountsTo}
+          onChangeSlide={currencyExchangeWidgetStore.updateActiveToAccount}
+          activeAccountCurrency={currencyExchangeWidgetStore.activeAccountTo}
+        />
       </div>
     </Container>
   )
