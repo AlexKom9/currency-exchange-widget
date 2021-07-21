@@ -127,6 +127,7 @@ class SliderContainer extends React.PureComponent<
             ref={(elem) => {
               this.slider = elem
             }}
+            data-testid="ac-slick-slider"
           >
             {accounts.map((account, index) => {
               const isActive = account.currency === activeAccountCurrency

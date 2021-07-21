@@ -50,7 +50,7 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
       <div className="container">
         <Header>
           <Button>Cancel</Button>
-          <Description>
+          <Description data-testid="ac-currency-exchange-slide-account-from-rate">
             {currencyExchangeWidgetStore.formattedAccountFromRate}
           </Description>
           <Button>Exchange</Button>

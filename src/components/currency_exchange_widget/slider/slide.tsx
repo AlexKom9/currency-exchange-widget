@@ -50,8 +50,6 @@ export const Slide = observer(
   ({ account, mode, isActive, onFocus, inputRef }: ISlide) => {
     const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
 
-    // const { formattedValueFrom, formattedValueTo } = currencyExchangeWidgetStore
-
     return (
       <Container
         data-testid={
@@ -60,10 +58,17 @@ export const Slide = observer(
             : 'ac-currency-exchange-slide'
         }
       >
-        <SlideInner>
+        <SlideInner
+          data-testid={`ac-currency-exchange-slide-${mode}-${account.currency}${
+            isActive ? '-active' : ''
+          }`}
+        >
           <div className="slide-info-container">
             <H2>{account.currency}</H2>
-            <Description className="mts">
+            <Description
+              data-testid="ac-currency-exchange-slide-account-sum"
+              className="mts"
+            >
               You have {account.formattedSum}
             </Description>
           </div>
@@ -92,7 +97,10 @@ export const Slide = observer(
                   onFocus={onFocus}
                 />
               </div>
-              <Description className="mts">
+              <Description
+                data-testid="ac-currency-exchange-slide-account-to-rate"
+                className="mts"
+              >
                 {currencyExchangeWidgetStore.formattedAccountToRate}
               </Description>
             </SlideAccountTOInfoContainer>
