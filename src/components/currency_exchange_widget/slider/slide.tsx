@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { RefObject } from 'react'
 import styled from 'styled-components'
 import { observer } from 'mobx-react'
 import { useCurrencyExchangeWidgetStore } from '../../../contexts/currency_exchange_widget_store_context'
@@ -43,15 +43,20 @@ interface ISlide {
   mode: 'from' | 'to'
   isActive: boolean
   onFocus: (e: React.FocusEvent<HTMLInputElement>) => void
+  inputRef?: RefObject<HTMLInputElement>
 }
 
 export const Slide = observer(
-  ({ account, mode, isActive, onFocus }: ISlide) => {
+  ({ account, mode, isActive, onFocus, inputRef }: ISlide) => {
     const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
 
     return (
       <Container
-        data-testid={`ac-currency-exchange-widget-slide-${mode}-account-${account.currency}`}
+        data-testid={
+          isActive
+            ? 'ac-currency-exchange-slide-active'
+            : 'ac-currency-exchange-slide'
+        }
       >
         <SlideInner>
           <div className="slide-info-container">
@@ -63,26 +68,26 @@ export const Slide = observer(
           {mode === 'from' ? (
             <div className="slide-value-container">
               <InputNumber
+                inputRef={inputRef}
                 data-testid="ac-currency-exchange-widget-input"
                 value={currencyExchangeWidgetStore.formattedValueFrom}
                 onChange={(e) => {
                   currencyExchangeWidgetStore.updateFromValue(e.target.value)
                 }}
                 onFocus={onFocus}
-                autofocus={isActive}
               />
             </div>
           ) : (
             <SlideAccountTOInfoContainer className="slide-info-container text-right">
               <div className="slide-value-container">
                 <InputNumber
+                  inputRef={inputRef}
                   data-testid="ac-currency-exchange-widget-input"
                   value={currencyExchangeWidgetStore.formattedValueTo}
                   onChange={(e) => {
                     currencyExchangeWidgetStore.updateToValue(e.target.value)
                   }}
                   onFocus={onFocus}
-                  autofocus={isActive}
                 />
               </div>
               <Description className="mts">

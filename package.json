@@ -50,11 +50,13 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": { 
+  "devDependencies": {
     "@types/currency-formatter": "^1.5.1",
     "@types/react-slick": "^0.23.5",
     "@types/styled-components": "^5.1.11",
-    "prettier": "^2.3.2"
+    "core-js": "^3.15.2",
+    "prettier": "^2.3.2",
+    "raf": "^3.4.1"
   },
   "jest": {
     "testMatch": [

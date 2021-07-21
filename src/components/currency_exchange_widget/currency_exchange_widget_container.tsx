@@ -65,7 +65,7 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
           onFocus={() => {
             currencyExchangeWidgetStore.updateActiveMode('from')
           }}
-          isActive={currencyExchangeWidgetStore.activeMode === 'from'}
+          isFocused={currencyExchangeWidgetStore.activeMode === 'from'}
         />
         <Slider
           key={currencyExchangeWidgetStore.key}
@@ -76,7 +76,7 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
           onFocus={() => {
             currencyExchangeWidgetStore.updateActiveMode('to')
           }}
-          isActive={currencyExchangeWidgetStore.activeMode === 'to'}
+          isFocused={currencyExchangeWidgetStore.activeMode === 'to'}
         />
       </div>
     </Container>

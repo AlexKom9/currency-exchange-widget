@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { RefObject } from 'react'
 import styled, { css } from 'styled-components'
 import { observer } from 'mobx-react'
 
@@ -52,21 +52,38 @@ interface ISlider {
   mode: 'from' | 'to'
   accounts: IAccountStore[]
   onChangeSlide: (currentIndex: number) => void
-  onFocus: (e: React.FocusEvent<HTMLInputElement>) => void
+  onFocus: (e?: React.FocusEvent<HTMLInputElement>) => void
   activeAccountCurrency: string
-  isActive: boolean
+  isFocused: boolean
 }
 
-class SliderContainer extends React.PureComponent<ISlider> {
+class SliderContainer extends React.PureComponent<
+  ISlider,
+  { currentSlideIndex: number }
+> {
   private slider: SlickSlider | null
+  private inputRef: RefObject<HTMLInputElement>
 
   constructor(props: ISlider) {
     super(props)
     this.slider = null
+    this.inputRef = React.createRef()
+
+    this.state = {
+      currentSlideIndex: 0,
+    }
   }
 
   componentDidMount() {
-    this.slider?.slickGoTo(0)
+    const { currentSlideIndex } = this.state
+
+    this.slider?.slickGoTo(currentSlideIndex)
+    this.props.onChangeSlide(currentSlideIndex)
+
+    if (this.props.mode === 'from') {
+      this.props.onFocus()
+      this.inputRef.current?.focus()
+    }
   }
 
   render() {
@@ -76,8 +93,9 @@ class SliderContainer extends React.PureComponent<ISlider> {
       onFocus,
       accounts,
       activeAccountCurrency,
-      isActive,
+      isFocused,
     } = this.props
+
     const slickSliderSettings = {
       dots: true,
       infinite: false,
@@ -86,9 +104,17 @@ class SliderContainer extends React.PureComponent<ISlider> {
       slidesToScroll: 1,
       arrows: false,
       beforeChange: (_prevIndex: number, nextIndex: number) => {
-        onChangeSlide(nextIndex)
+        this.setState({ currentSlideIndex: nextIndex })
+      },
+      afterChange: (nextIndex: number) => {
+        if (this.props.isFocused) {
+          this.inputRef.current?.focus()
+          onChangeSlide(nextIndex)
+        }
       },
     }
+
+    console.log(`${mode} isFocused =>`, isFocused)
 
     return (
       <Container
@@ -102,21 +128,27 @@ class SliderContainer extends React.PureComponent<ISlider> {
               this.slider = elem
             }}
           >
-            {accounts.map((account) => (
-              <div
-                key={account.currency}
-                data-testid="ac-currency-exchange-widget-slider-slide"
-              >
-                <Slide
-                  account={account}
-                  mode={mode}
-                  isActive={
-                    isActive && account.currency === activeAccountCurrency
-                  }
-                  onFocus={onFocus}
-                />
-              </div>
-            ))}
+            {accounts.map((account, index) => {
+              const isActive = account.currency === activeAccountCurrency
+              return (
+                <div
+                  key={account.currency}
+                  data-testid="ac-currency-exchange-widget-slider-slide"
+                >
+                  <Slide
+                    inputRef={
+                      this.state.currentSlideIndex === index
+                        ? this.inputRef
+                        : undefined
+                    }
+                    account={account}
+                    mode={mode}
+                    isActive={isActive}
+                    onFocus={onFocus}
+                  />
+                </div>
+              )
+            })}
           </SlickSlider>
         </div>
       </Container>

@@ -12,7 +12,7 @@ const accountsStore = AccountsStore.create({
   ],
 })
 
-const fetcher = new FakeFetcher({ randomizeRates: false })
+const fetcher = new FakeFetcher({ randomizeRates: true })
 
 function App() {
   return (

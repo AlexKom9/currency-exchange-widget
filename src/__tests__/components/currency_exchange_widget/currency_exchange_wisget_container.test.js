@@ -1,9 +1,15 @@
+// import 'core-js/es6/map'
+// import 'core-js/es6/set'
+import '../../matchMedia'
+import 'raf/polyfill'
+
 import React from 'react'
-import { fireEvent, waitFor, screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 
 import { renderCurrencyExchangeWidget } from './helpers'
 import { AccountsStore } from '../../../stores/accounts_store'
 import { FakeFetcher } from '../../../stores/helpers/fake_fetcher'
+import userEvent from '@testing-library/user-event'
 
 // jest.useRealTimers()
 
@@ -157,7 +163,7 @@ describe('CurrencyExchangeWidget', () => {
     })
   })
 
-  describe.only(`USD to GBP`, () => {
+  describe(`USD to GBP`, () => {
     let fromAccountSlider
     let toAccountSlider
 
@@ -184,20 +190,31 @@ describe('CurrencyExchangeWidget', () => {
     })
 
     it(`should be active GBP`, async () => {
-      expect(toAccountSlider).toBeInTheDocument()
-
-      const fromAccountSlide = await screen.findByTestId(
-        'ac-currency-exchange-widget-slide-from-account-USD'
+      const fromAccountSlide = await within(fromAccountSlider).findByTestId(
+        'ac-currency-exchange-slide-active'
       )
-      const toAccountSlide = await screen.findByTestId(
-        'ac-currency-exchange-widget-slide-to-account-GBP'
+      const toAccountSlide = await within(toAccountSlider).findByTestId(
+        'ac-currency-exchange-slide-active'
       )
 
-      const input = within(fromAccountSlide).getByTestId(
+      const inputFrom = within(fromAccountSlide).getByTestId(
+        'ac-currency-exchange-widget-input'
+      )
+      const inputTo = within(toAccountSlide).getByTestId(
         'ac-currency-exchange-widget-input'
       )
 
-      expect(input).toBeInTheDocument()
+      expect(inputFrom).toBeInTheDocument()
+
+      await waitFor(() => expect(document.activeElement).toEqual(inputFrom))
+
+      expect(inputFrom.value).toMatchInlineSnapshot(`""`)
+      expect(inputTo.value).toMatchInlineSnapshot(`""`)
+
+      userEvent.type(inputFrom, '10')
+
+      expect(inputFrom.value).toMatchInlineSnapshot(`"-10"`)
+      expect(inputTo.value).toMatchInlineSnapshot(`"+8.47"`)
     })
   })
 })

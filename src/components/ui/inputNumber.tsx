@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react'
-import React, { useEffect, useRef } from 'react'
+import React, { RefObject } from 'react'
 import styled from 'styled-components'
 
 const InputNumberStyled = styled.input`
@@ -18,6 +18,7 @@ interface IInputNumber {
   value: number | string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onFocus: (e: React.FocusEvent<HTMLInputElement>) => void
+  inputRef?: RefObject<HTMLInputElement>
 }
 
 function format(str: string | number = ''): string {
@@ -39,35 +40,18 @@ export const InputNumber = observer(
     disabled = false,
     onFocus,
     autofocus,
+    inputRef,
     ...rest
   }: IInputNumber) => {
-    const ref = useRef<HTMLInputElement>(null)
-
-    const focus = () => {
-      if (ref.current?.focus instanceof Function) {
-        ref.current.focus()
-      }
-    }
-
-    useEffect(() => {
-      if (autofocus && !disabled) {
-        setTimeout(() => {
-          focus()
-        }, 400)
-      }
-    }, [ref, autofocus, disabled])
-
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       e.target.value = format(e.target.value)
-
       onChange(e)
     }
 
     return (
       <InputNumberStyled
         {...rest}
-        ref={autofocus && !disabled ? ref : undefined}
+        ref={inputRef}
         value={value}
         onChange={handleChange}
         onFocus={onFocus}
