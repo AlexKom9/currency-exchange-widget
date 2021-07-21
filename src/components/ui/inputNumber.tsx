@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import { useAutoFocus } from '../../hooks/use_auto_focus'
 
 const InputNumberStyled = styled.input`
   background: none;
@@ -18,6 +17,7 @@ interface IInputNumber {
   autofocus?: boolean
   value: number | string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onFocus: (e: React.FocusEvent<HTMLInputElement>) => void
 }
 
 function format(str: string | number = ''): string {
@@ -33,18 +33,30 @@ function format(str: string | number = ''): string {
 }
 
 export const InputNumber = observer(
-  ({ value, onChange, disabled = false, autofocus, ...rest }: IInputNumber) => {
-    const [ref, focus] = useAutoFocus()
+  ({
+    value,
+    onChange,
+    disabled = false,
+    onFocus,
+    autofocus,
+    ...rest
+  }: IInputNumber) => {
+    const ref = useRef<HTMLInputElement>(null)
+
+    const focus = () => {
+      if (ref.current?.focus instanceof Function) {
+        ref.current.focus()
+      }
+    }
 
     useEffect(() => {
-      if (!disabled && autofocus) {
-        if (typeof focus === 'function') {
-          setTimeout(() => {
-            focus()
-          }, 300)
-        }
+      if (autofocus && !disabled) {
+        setTimeout(() => {
+          focus()
+        }, 400)
       }
-    }, [autofocus, disabled, focus])
+    }, [ref, autofocus, disabled])
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       e.target.value = format(e.target.value)
@@ -58,6 +70,7 @@ export const InputNumber = observer(
         ref={autofocus && !disabled ? ref : undefined}
         value={value}
         onChange={handleChange}
+        onFocus={onFocus}
         disabled={disabled}
         type="text"
       />

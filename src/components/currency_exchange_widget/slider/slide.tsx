@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { observer } from 'mobx-react'
 import { useCurrencyExchangeWidgetStore } from '../../../contexts/currency_exchange_widget_store_context'
@@ -42,57 +42,56 @@ interface ISlide {
   account: IAccountStore
   mode: 'from' | 'to'
   isActive: boolean
+  onFocus: (e: React.FocusEvent<HTMLInputElement>) => void
 }
 
-export const Slide = observer(({ account, mode, isActive }: ISlide) => {
-  const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
+export const Slide = observer(
+  ({ account, mode, isActive, onFocus }: ISlide) => {
+    const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    currencyExchangeWidgetStore.updateFromValue({
-      value: e.target.value,
-    })
-  }
-
-  let valueFrom = currencyExchangeWidgetStore.valueFrom
-
-  if (valueFrom && valueFrom[0] !== '-') {
-    valueFrom = `-${valueFrom}`
-  }
-
-
-  return (
-    <Container
-      data-testid={`ac-currency-exchange-widget-slide-${mode}-account-${account.currency}`}
-    >
-      <SlideInner>
-        <div className="slide-info-container">
-          <H2>{account.currency}</H2>
-          <Description className="mts">
-            You have {account.formattedSum}
-          </Description>
-        </div>
-        {mode === 'from' ? (
-          <div className="slide-value-container">
-            <InputNumber
-              data-testid="ac-currency-exchange-widget-input"
-              disabled={!isActive}
-              value={valueFrom}
-              onChange={handleChange}
-              autofocus={isActive}
-            />
-          </div>
-        ) : (
-          <SlideAccountTOInfoContainer className="slide-info-container text-right">
-            <H2>
-              {currencyExchangeWidgetStore.shouldShowFormattedValueTo &&
-                `+${currencyExchangeWidgetStore.formattedValueTo}`}
-            </H2>
+    return (
+      <Container
+        data-testid={`ac-currency-exchange-widget-slide-${mode}-account-${account.currency}`}
+      >
+        <SlideInner>
+          <div className="slide-info-container">
+            <H2>{account.currency}</H2>
             <Description className="mts">
-              {currencyExchangeWidgetStore.formattedAccountToRate}
+              You have {account.formattedSum}
             </Description>
-          </SlideAccountTOInfoContainer>
-        )}
-      </SlideInner>
-    </Container>
-  )
-})
+          </div>
+          {mode === 'from' ? (
+            <div className="slide-value-container">
+              <InputNumber
+                data-testid="ac-currency-exchange-widget-input"
+                value={currencyExchangeWidgetStore.formattedValueFrom}
+                onChange={(e) => {
+                  currencyExchangeWidgetStore.updateFromValue(e.target.value)
+                }}
+                onFocus={onFocus}
+                autofocus={isActive}
+              />
+            </div>
+          ) : (
+            <SlideAccountTOInfoContainer className="slide-info-container text-right">
+              <div className="slide-value-container">
+                <InputNumber
+                  data-testid="ac-currency-exchange-widget-input"
+                  value={currencyExchangeWidgetStore.formattedValueTo}
+                  onChange={(e) => {
+                    currencyExchangeWidgetStore.updateToValue(e.target.value)
+                  }}
+                  onFocus={onFocus}
+                  autofocus={isActive}
+                />
+              </div>
+              <Description className="mts">
+                {currencyExchangeWidgetStore.formattedAccountToRate}
+              </Description>
+            </SlideAccountTOInfoContainer>
+          )}
+        </SlideInner>
+      </Container>
+    )
+  }
+)

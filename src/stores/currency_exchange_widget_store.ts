@@ -15,13 +15,29 @@ const CurrencyUnionType = types.union(
   ...CURRENCIES.map((item) => types.literal(item))
 )
 
+const addSymbol = (
+  value: number | string,
+  sign: '-' | '+',
+  formatter?: (value: number) => string
+) =>
+  value
+    ? `${sign}${
+        typeof formatter === 'function' ? formatter(Number(value)) : value
+      }`
+    : ''
+
 export const CurrencyExchangeWidgetStore = types
   .model({
     activeAccountFrom: types.maybeNull(CurrencyUnionType),
     activeAccountTo: types.maybeNull(CurrencyUnionType),
     valueFrom: '',
+    valueTo: '',
     ratesData: types.optional(CurrencyExchangeRatesResponseData, {}),
     networkStatus: types.optional(LoadingStatus, {}),
+    activeMode: types.optional(
+      types.union(types.literal('from'), types.literal('to')),
+      'from'
+    ),
     key: nanoid(),
   })
   .views((self) => ({
@@ -78,21 +94,38 @@ export const CurrencyExchangeWidgetStore = types
 
       return `${first}= ${second}`
     },
-    get formattedValueFrom() {
-      return String(self.valueFrom)
-    },
-    get valueTo() {
+    get calculatedValueFrom() {
       if (!self.ratesData.rates) {
         return 0
       }
 
-      return this.accountFromRate * Number(self.valueFrom)
+      return Number(self.valueTo) / this.accountFromRate || 0
+    },
+    get calculatedValueTo() {
+      if (!self.ratesData.rates) {
+        return 0
+      }
+
+      return this.accountFromRate * Number(self.valueFrom) || 0
+    },
+    get formattedValueFrom() {
+      if (self.activeMode === 'from') {
+        return addSymbol(self.valueFrom, '-')
+      }
+
+      return addSymbol(this.calculatedValueFrom, '-', (value) =>
+        value.toFixed(2)
+      )
     },
     get formattedValueTo() {
-      return this.valueTo.toFixed(2)
+      if (self.activeMode === 'to') {
+        return addSymbol(self.valueTo, '+')
+      }
+
+      return addSymbol(this.calculatedValueTo, '+', (value) => value.toFixed(2))
     },
     get shouldShowFormattedValueTo() {
-      return Boolean(this.valueTo)
+      return Boolean(self.valueTo)
     },
     get fetcher(): FakeFetcher {
       return getEnv(self).fetcher
@@ -107,12 +140,11 @@ export const CurrencyExchangeWidgetStore = types
           self.networkStatus.update('in_progress')
 
           const response = yield self.fetcher.apiGet(
-            `https://openexchangerates.org/api/latest.json?app_id=${process.env.REACT_APP_OPENEXCHANGERATES_API_KEY}`
+            `https://openexchangerates.org/api/latest.json?app_id=${process.env._APP_OPENEXCHANGERATES_API_KEY}`
           )
 
           self.networkStatus.update('success')
 
-          // console.log('-->', response)
           applySnapshot(self.ratesData, response)
         } catch (e) {
           self.networkStatus.update('error')
@@ -139,8 +171,24 @@ export const CurrencyExchangeWidgetStore = types
 
         self.activeAccountTo = newActiveCurrency
       },
-      updateFromValue({ value }: { value: string }) {
-        self.valueFrom = value.replace(/-/, '')
+      updateFromValue(value: number | string) {
+        self.valueFrom =
+          typeof value === 'string' ? value.replace(/-/, '') : String(value)
+      },
+      updateToValue(value: number | string) {
+        self.valueTo =
+          typeof value === 'string' ? value.replace(/\+/, '') : String(value)
+      },
+      updateActiveMode(mode: 'from' | 'to') {
+        if (self.activeMode === mode) return
+
+        if (mode === 'to') {
+          this.updateToValue(Number(self.calculatedValueTo.toFixed(2)))
+        } else {
+          this.updateFromValue(Number(self.calculatedValueFrom.toFixed(2)))
+        }
+
+        self.activeMode = mode
       },
       init() {
         this.monitorCurrencyRates()

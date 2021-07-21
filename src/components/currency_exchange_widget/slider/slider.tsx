@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import styled, { css } from 'styled-components'
 import { observer } from 'mobx-react'
 
@@ -52,7 +52,9 @@ interface ISlider {
   mode: 'from' | 'to'
   accounts: IAccountStore[]
   onChangeSlide: (currentIndex: number) => void
+  onFocus: (e: React.FocusEvent<HTMLInputElement>) => void
   activeAccountCurrency: string
+  isActive: boolean
 }
 
 class SliderContainer extends React.PureComponent<ISlider> {
@@ -68,7 +70,14 @@ class SliderContainer extends React.PureComponent<ISlider> {
   }
 
   render() {
-    const { mode, onChangeSlide, accounts, activeAccountCurrency } = this.props
+    const {
+      mode,
+      onChangeSlide,
+      onFocus,
+      accounts,
+      activeAccountCurrency,
+      isActive,
+    } = this.props
     const slickSliderSettings = {
       dots: true,
       infinite: false,
@@ -101,7 +110,10 @@ class SliderContainer extends React.PureComponent<ISlider> {
                 <Slide
                   account={account}
                   mode={mode}
-                  isActive={account.currency === activeAccountCurrency}
+                  isActive={
+                    isActive && account.currency === activeAccountCurrency
+                  }
+                  onFocus={onFocus}
                 />
               </div>
             ))}
