@@ -63,6 +63,7 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
           onChangeSlide={currencyExchangeWidgetStore.updateActiveFromAccount}
           activeAccountCurrency={currencyExchangeWidgetStore.activeAccountFrom}
           onFocus={() => {
+            console.log('onFocus ->')
             currencyExchangeWidgetStore.updateActiveMode('from')
           }}
           isFocused={currencyExchangeWidgetStore.activeMode === 'from'}

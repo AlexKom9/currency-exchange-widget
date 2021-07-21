@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react'
 import React, { RefObject } from 'react'
 import styled from 'styled-components'
 
@@ -21,19 +20,7 @@ interface IInputNumber {
   inputRef?: RefObject<HTMLInputElement>
 }
 
-function format(str: string | number = ''): string {
-  if (Number(str) === Infinity) {
-    return String(Infinity)
-  }
-
-  return String(str)
-    .replace(/[^0-9.]/g, '')
-    .replace(/^([^.]*\.)(.*)$/, function (_, pattern1, pattern2) {
-      return pattern1 + pattern2.replaceAll('.', '')
-    })
-}
-
-export const InputNumber = observer(
+export const InputNumber = React.memo(
   ({
     value,
     onChange,
@@ -44,7 +31,6 @@ export const InputNumber = observer(
     ...rest
   }: IInputNumber) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      e.target.value = format(e.target.value)
       onChange(e)
     }
 

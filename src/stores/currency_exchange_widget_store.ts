@@ -5,6 +5,8 @@ import { formatValueInCurrency } from './helpers/format_value_in_currency'
 import { CURRENCIES } from '../constants'
 import { FakeFetcher } from './helpers/fake_fetcher'
 import { nanoid } from 'nanoid'
+import { formatNumberToStore } from './helpers/format_number_to_store'
+import { addSymbol } from './helpers/add_symobol'
 
 const CurrencyExchangeRatesResponseData = types.model({
   base: 'USD',
@@ -14,17 +16,6 @@ const CurrencyExchangeRatesResponseData = types.model({
 const CurrencyUnionType = types.union(
   ...CURRENCIES.map((item) => types.literal(item))
 )
-
-const addSymbol = (
-  value: number | string,
-  sign: '-' | '+',
-  formatter?: (value: number) => string
-) =>
-  value
-    ? `${sign}${
-        typeof formatter === 'function' ? formatter(Number(value)) : value
-      }`
-    : ''
 
 export const CurrencyExchangeWidgetStore = types
   .model({
@@ -172,12 +163,10 @@ export const CurrencyExchangeWidgetStore = types
         self.activeAccountTo = newActiveCurrency
       },
       updateFromValue(value: number | string) {
-        self.valueFrom =
-          typeof value === 'string' ? value.replace(/-/, '') : String(value)
+        self.valueFrom = formatNumberToStore(value)
       },
       updateToValue(value: number | string) {
-        self.valueTo =
-          typeof value === 'string' ? value.replace(/\+/, '') : String(value)
+        self.valueTo = formatNumberToStore(value)
       },
       updateActiveMode(mode: 'from' | 'to') {
         if (self.activeMode === mode) return

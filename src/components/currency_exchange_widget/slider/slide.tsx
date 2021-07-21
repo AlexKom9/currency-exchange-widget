@@ -50,6 +50,8 @@ export const Slide = observer(
   ({ account, mode, isActive, onFocus, inputRef }: ISlide) => {
     const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
 
+    // const { formattedValueFrom, formattedValueTo } = currencyExchangeWidgetStore
+
     return (
       <Container
         data-testid={
