@@ -82,6 +82,7 @@ export const Slide = observer(
                   currencyExchangeWidgetStore.updateFromValue(e.target.value)
                 }}
                 onFocus={onFocus}
+                disabled={!isActive}
               />
             </div>
           ) : (
@@ -95,6 +96,7 @@ export const Slide = observer(
                     currencyExchangeWidgetStore.updateToValue(e.target.value)
                   }}
                   onFocus={onFocus}
+                  disabled={!isActive}
                 />
               </div>
               <Description

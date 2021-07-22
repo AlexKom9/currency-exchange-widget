@@ -77,13 +77,7 @@ class SliderContainer extends React.PureComponent<
   }
 
   render() {
-    const {
-      mode,
-      onChangeSlide,
-      onFocus,
-      accounts,
-      activeAccountCurrency,
-    } = this.props
+    const { mode, onChangeSlide, onFocus, accounts } = this.props
 
     const slickSliderSettings = {
       dots: true,
@@ -117,18 +111,15 @@ class SliderContainer extends React.PureComponent<
             data-testid="ac-slick-slider"
           >
             {accounts.map((account, index) => {
-              const isActive = account.currency === activeAccountCurrency
+              const isActive = this.state.currentSlideIndex === index
+
               return (
                 <div
                   key={account.currency}
                   data-testid="ac-currency-exchange-widget-slider-slide"
                 >
                   <Slide
-                    inputRef={
-                      this.state.currentSlideIndex === index
-                        ? this.inputRef
-                        : undefined
-                    }
+                    inputRef={isActive ? this.inputRef : undefined}
                     account={account}
                     mode={mode}
                     isActive={isActive}
