@@ -1,20 +1,5 @@
-// export const getMock = (path) => {
-//   const fileValue = String(fs.readFileSync(path))
 import { RatesResponse } from '../../fixtures/rates_response'
 import { Fetcher } from '../../types/fetcher'
-
-//   try {
-//     return JSON.parse(fileValue)
-//   } catch (e) {
-//     throw new Error(
-//       JSON.stringify({
-//         error: e.message,
-//         fileName: path,
-//         fileValue: fileValue,
-//       }),
-//     )
-//   }
-// }
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min)

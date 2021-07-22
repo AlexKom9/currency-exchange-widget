@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import { CurrencyExchangeWidgetContainer } from './currency_exchange_widget_container'
 import { CurrencyExchangeWidgetStoreContext } from '../../contexts/currency_exchange_widget_store_context'
@@ -17,7 +17,7 @@ export const CurrencyExchangeWidgetRoot = ({
   accountsStore,
   fetcher,
 }: ICurrencyExchangeWidgetRoot) => {
-  const initStore = (): ICurrencyExchangeWidgetStore => {
+  const initStore = useCallback((): ICurrencyExchangeWidgetStore => {
     const store = CurrencyExchangeWidgetStore.create(
       {},
       { accountsStore, fetcher }
@@ -26,11 +26,11 @@ export const CurrencyExchangeWidgetRoot = ({
     store.init()
 
     return store
-  }
+  }, [accountsStore, fetcher])
 
-  const resetStore = (store: ICurrencyExchangeWidgetStore) => {
+  const resetStore = useCallback((store: ICurrencyExchangeWidgetStore) => {
     store.reset()
-  }
+  }, [])
 
   const [shouldRender, store] = useInitStore<ICurrencyExchangeWidgetStore>(
     initStore,

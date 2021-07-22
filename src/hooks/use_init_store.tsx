@@ -34,8 +34,7 @@ export function useInitStore<T = void>(
         resetStore(storeRef.current)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [initStore, resetStore])
 
   return [shouldRender, storeRef.current]
 }

@@ -123,7 +123,7 @@ export const CurrencyExchangeWidgetStore = types
     },
   }))
   .actions((self) => {
-    let fetchTimer: ReturnType<typeof setTimeout>
+    let fetchInterval: ReturnType<typeof setInterval>
 
     return {
       fetchCurrencyRates: flow(function* () {
@@ -131,7 +131,7 @@ export const CurrencyExchangeWidgetStore = types
           self.networkStatus.update('in_progress')
 
           const response = yield self.fetcher.apiGet(
-            `https://openexchangerates.org/api/latest.json?app_id=${process.env._APP_OPENEXCHANGERATES_API_KEY}`
+            `https://openexchangerates.org/api/latest.json?app_id=${process.env.REACT_APP_OPENEXCHANGERATES_API_KEY}`
           )
 
           self.networkStatus.update('success')
@@ -142,16 +142,10 @@ export const CurrencyExchangeWidgetStore = types
           console.error(e)
         }
       }),
-      monitorCurrencyRates() {
-        this.fetchCurrencyRates().then(() => {
-          if (fetchTimer) {
-            clearTimeout(fetchTimer)
-          }
-
-          fetchTimer = setTimeout(() => {
-            this.monitorCurrencyRates()
-          }, 1000)
-        })
+      startToMonitorCurrencyRates() {
+        fetchInterval = setInterval(() => {
+          this.fetchCurrencyRates()
+        }, 1000)
       },
       updateActiveFromAccount(index: number) {
         self.activeAccountFrom = self.accounts[index].currency
@@ -180,11 +174,11 @@ export const CurrencyExchangeWidgetStore = types
         self.activeMode = mode
       },
       init() {
-        this.monitorCurrencyRates()
+        this.startToMonitorCurrencyRates()
       },
       reset() {
+        clearInterval(fetchInterval)
         detach(self)
-        clearTimeout(fetchTimer)
       },
     }
   })
