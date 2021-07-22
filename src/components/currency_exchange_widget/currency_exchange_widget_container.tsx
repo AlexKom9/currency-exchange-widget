@@ -45,6 +45,10 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
     return null
   }
 
+  const handleFocus = (mode: 'from' | 'to') => () => {
+    currencyExchangeWidgetStore.updateActiveMode(mode)
+  }
+
   return (
     <Container data-testid="ac-currency-exchange-widget-container">
       <div className="container">
@@ -62,10 +66,7 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
           accounts={currencyExchangeWidgetStore.accounts}
           onChangeSlide={currencyExchangeWidgetStore.updateActiveFromAccount}
           activeAccountCurrency={currencyExchangeWidgetStore.activeAccountFrom}
-          onFocus={() => {
-            console.log('onFocus ->')
-            currencyExchangeWidgetStore.updateActiveMode('from')
-          }}
+          onFocus={handleFocus('from')}
           isFocused={currencyExchangeWidgetStore.activeMode === 'from'}
         />
         <Slider
@@ -74,9 +75,7 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
           accounts={currencyExchangeWidgetStore.accountsTo}
           onChangeSlide={currencyExchangeWidgetStore.updateActiveToAccount}
           activeAccountCurrency={currencyExchangeWidgetStore.activeAccountTo}
-          onFocus={() => {
-            currencyExchangeWidgetStore.updateActiveMode('to')
-          }}
+          onFocus={handleFocus('to')}
           isFocused={currencyExchangeWidgetStore.activeMode === 'to'}
         />
       </div>

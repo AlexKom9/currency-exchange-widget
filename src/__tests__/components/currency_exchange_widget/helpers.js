@@ -38,8 +38,5 @@ export const renderCurrencyExchangeWidget = async ({
     },
     fromAccountSlider,
     toAccountSlider,
-    // fromAccountSliderDots,
-    // toAccountSliderDots,
-    // nextSlide
   }
 }

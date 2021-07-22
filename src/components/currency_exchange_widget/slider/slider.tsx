@@ -14,16 +14,6 @@ const Container = styled.div<Pick<ISlider, 'mode'>>`
   width: 100%;
   padding-top: 32px;
 
-  .swiper-container {
-    height: 100%;
-    box-sizing: border-box;
-    padding-bottom: 20px;
-  }
-
-  .swiper-pagination {
-    bottom: 32px;
-  }
-
   ${({ mode }) =>
     mode === 'from'
       ? css`
@@ -93,7 +83,6 @@ class SliderContainer extends React.PureComponent<
       onFocus,
       accounts,
       activeAccountCurrency,
-      isFocused,
     } = this.props
 
     const slickSliderSettings = {
@@ -113,8 +102,6 @@ class SliderContainer extends React.PureComponent<
         }
       },
     }
-
-    console.log(`${mode} isFocused =>`, isFocused)
 
     return (
       <Container

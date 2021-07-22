@@ -9,6 +9,7 @@ export const formatNumberToStore = (str: string | number = ''): string => {
     .map((item, index) => (index === 1 ? item.slice(0, 2) : item))
     .join('.')
 
+
   if (result.length === 2 && result[0] === '0' && Number(result[1]) > 0) {
     return result.slice(1)
   }

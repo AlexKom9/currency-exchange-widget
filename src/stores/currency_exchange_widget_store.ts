@@ -6,7 +6,7 @@ import { CURRENCIES } from '../constants'
 import { FakeFetcher } from './helpers/fake_fetcher'
 import { nanoid } from 'nanoid'
 import { formatNumberToStore } from './helpers/format_number_to_store'
-import { addSymbol } from './helpers/add_symobol'
+import { addSymbol } from './helpers/add_symbol'
 
 const CurrencyExchangeRatesResponseData = types.model({
   base: 'USD',

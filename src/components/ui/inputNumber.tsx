@@ -10,7 +10,6 @@ const InputNumberStyled = styled.input`
   outline: none;
   text-align: right;
 `
-
 interface IInputNumber {
   disabled?: boolean
   autofocus?: boolean
