@@ -7,14 +7,17 @@ import { FakeFetcher } from './helpers/fake_fetcher'
 import { nanoid } from 'nanoid'
 import { formatNumberToStore } from './helpers/format_number_to_store'
 import { addSymbol } from './helpers/add_symbol'
+import { EMode } from '../types/mode'
+
+const BASE_CURRENCY = 'USD'
 
 const CurrencyExchangeRatesResponseData = types.model({
-  base: 'USD',
+  base: BASE_CURRENCY,
   rates: types.map(types.number),
 })
 
 const CurrencyUnionType = types.union(
-  ...CURRENCIES.map((item) => types.literal(item))
+  ...CURRENCIES.map((currency) => types.literal(currency))
 )
 
 export const CurrencyExchangeWidgetStore = types
@@ -26,8 +29,8 @@ export const CurrencyExchangeWidgetStore = types
     ratesData: types.optional(CurrencyExchangeRatesResponseData, {}),
     networkStatus: types.optional(LoadingStatus, {}),
     activeMode: types.optional(
-      types.union(types.literal('from'), types.literal('to')),
-      'from'
+      types.union(types.literal(EMode.from), types.literal(EMode.to)),
+      EMode.from
     ),
     key: nanoid(),
   })
@@ -51,7 +54,7 @@ export const CurrencyExchangeWidgetStore = types
       return accountToRate
     },
     get accountFromRate() {
-      if (self.activeAccountFrom === 'USD') {
+      if (self.activeAccountFrom === BASE_CURRENCY) {
         return self.ratesData.rates.get(self.activeAccountTo) || 0
       }
 
@@ -100,7 +103,7 @@ export const CurrencyExchangeWidgetStore = types
       return this.accountFromRate * Number(self.valueFrom) || 0
     },
     get formattedValueFrom() {
-      if (self.activeMode === 'from') {
+      if (self.activeMode === EMode.from) {
         return addSymbol(self.valueFrom, '-')
       }
 
@@ -109,7 +112,7 @@ export const CurrencyExchangeWidgetStore = types
       )
     },
     get formattedValueTo() {
-      if (self.activeMode === 'to') {
+      if (self.activeMode === EMode.to) {
         return addSymbol(self.valueTo, '+')
       }
 
@@ -162,10 +165,10 @@ export const CurrencyExchangeWidgetStore = types
       updateToValue(value: number | string) {
         self.valueTo = formatNumberToStore(value)
       },
-      updateActiveMode(mode: 'from' | 'to') {
+      updateActiveMode(mode: EMode) {
         if (self.activeMode === mode) return
 
-        if (mode === 'to') {
+        if (mode === EMode.to) {
           this.updateToValue(Number(self.calculatedValueTo.toFixed(2)))
         } else {
           this.updateFromValue(Number(self.calculatedValueFrom.toFixed(2)))

@@ -8,6 +8,7 @@ import 'slick-carousel/slick/slick-theme.css'
 
 import { Slide } from './slide'
 import { IAccountStore } from '../../../types/accounts_store'
+import { EMode } from '../../../types/mode'
 
 const Container = styled.div<Pick<ISlider, 'mode'>>`
   height: 200px;
@@ -15,7 +16,7 @@ const Container = styled.div<Pick<ISlider, 'mode'>>`
   padding-top: 32px;
 
   ${({ mode }) =>
-    mode === 'from'
+    mode === EMode.from
       ? css`
           position: relative;
           background: #3f94e4;
@@ -39,7 +40,7 @@ const Container = styled.div<Pick<ISlider, 'mode'>>`
 `
 
 interface ISlider {
-  mode: 'from' | 'to'
+  mode: EMode,
   accounts: IAccountStore[]
   onChangeSlide: (currentIndex: number) => void
   onFocus: (e?: React.FocusEvent<HTMLInputElement>) => void
@@ -70,7 +71,7 @@ class SliderContainer extends React.PureComponent<
     this.slider?.slickGoTo(currentSlideIndex)
     this.props.onChangeSlide(currentSlideIndex)
 
-    if (this.props.mode === 'from') {
+    if (this.props.mode === EMode.from) {
       this.props.onFocus()
       this.inputRef.current?.focus()
     }

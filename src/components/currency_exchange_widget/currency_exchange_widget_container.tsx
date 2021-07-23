@@ -5,6 +5,7 @@ import { useCurrencyExchangeWidgetStore } from '../../contexts/currency_exchange
 import { Button } from '../ui/button'
 import { Slider } from './slider/slider'
 import { Description } from '../ui/typography'
+import { EMode } from '../../types/mode'
 
 const Container = styled.div`
   background: #3f94e4;
@@ -45,7 +46,7 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
     return null
   }
 
-  const handleFocus = (mode: 'from' | 'to') => () => {
+  const handleFocus = (mode: EMode) => () => {
     currencyExchangeWidgetStore.updateActiveMode(mode)
   }
 
@@ -62,21 +63,21 @@ export const CurrencyExchangeWidgetContainer = observer(() => {
       </div>
       <div>
         <Slider
-          mode="from"
+          mode={EMode.from}
           accounts={currencyExchangeWidgetStore.accounts}
           onChangeSlide={currencyExchangeWidgetStore.updateActiveFromAccount}
           activeAccountCurrency={currencyExchangeWidgetStore.activeAccountFrom}
-          onFocus={handleFocus('from')}
-          isFocused={currencyExchangeWidgetStore.activeMode === 'from'}
+          onFocus={handleFocus(EMode.from)}
+          isFocused={currencyExchangeWidgetStore.activeMode === EMode.from}
         />
         <Slider
           key={currencyExchangeWidgetStore.key}
-          mode="to"
+          mode={EMode.to}
           accounts={currencyExchangeWidgetStore.accountsTo}
           onChangeSlide={currencyExchangeWidgetStore.updateActiveToAccount}
           activeAccountCurrency={currencyExchangeWidgetStore.activeAccountTo}
-          onFocus={handleFocus('to')}
-          isFocused={currencyExchangeWidgetStore.activeMode === 'to'}
+          onFocus={handleFocus(EMode.to)}
+          isFocused={currencyExchangeWidgetStore.activeMode === EMode.to}
         />
       </div>
     </Container>

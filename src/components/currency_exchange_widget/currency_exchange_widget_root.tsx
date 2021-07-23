@@ -38,7 +38,7 @@ export const CurrencyExchangeWidgetRoot = ({
   )
 
   if (!shouldRender) {
-    return null
+    return <span>"...loading"</span>
   }
 
   return (

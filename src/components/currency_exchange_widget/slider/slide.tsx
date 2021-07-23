@@ -5,6 +5,7 @@ import { useCurrencyExchangeWidgetStore } from '../../../contexts/currency_excha
 import { IAccountStore } from '../../../types/accounts_store'
 import { InputNumber } from '../../ui/inputNumber'
 import { Description, H2 } from '../../ui/typography'
+import { EMode } from '../../../types/mode'
 
 const Container = styled.div`
   box-sizing: border-box;
@@ -40,7 +41,7 @@ const SlideAccountTOInfoContainer = styled.div`
 
 interface ISlide {
   account: IAccountStore
-  mode: 'from' | 'to'
+  mode: EMode
   isActive: boolean
   onFocus: (e: React.FocusEvent<HTMLInputElement>) => void
   inputRef?: RefObject<HTMLInputElement>
@@ -49,6 +50,18 @@ interface ISlide {
 export const Slide = observer(
   ({ account, mode, isActive, onFocus, inputRef }: ISlide) => {
     const { currencyExchangeWidgetStore } = useCurrencyExchangeWidgetStore()
+
+    const handleChangeInputFrom = (
+      e: React.ChangeEvent<HTMLInputElement>
+    ): void => {
+      currencyExchangeWidgetStore.updateFromValue(e.target.value)
+    }
+
+    const handleChangeInputTo = (
+      e: React.ChangeEvent<HTMLInputElement>
+    ): void => {
+      currencyExchangeWidgetStore.updateToValue(e.target.value)
+    }
 
     return (
       <Container
@@ -72,15 +85,13 @@ export const Slide = observer(
               You have {account.formattedSum}
             </Description>
           </div>
-          {mode === 'from' ? (
+          {mode === EMode.from ? (
             <div className="slide-value-container">
               <InputNumber
                 inputRef={inputRef}
                 data-testid="ac-currency-exchange-widget-input"
                 value={currencyExchangeWidgetStore.formattedValueFrom}
-                onChange={(e) => {
-                  currencyExchangeWidgetStore.updateFromValue(e.target.value)
-                }}
+                onChange={handleChangeInputFrom}
                 onFocus={onFocus}
                 disabled={!isActive}
               />
@@ -92,9 +103,7 @@ export const Slide = observer(
                   inputRef={inputRef}
                   data-testid="ac-currency-exchange-widget-input"
                   value={currencyExchangeWidgetStore.formattedValueTo}
-                  onChange={(e) => {
-                    currencyExchangeWidgetStore.updateToValue(e.target.value)
-                  }}
+                  onChange={handleChangeInputTo}
                   onFocus={onFocus}
                   disabled={!isActive}
                 />
